@@ -1,4 +1,4 @@
-import { ethers, sha256 } from "ethers";
+import { ethers } from "ethers";
 import {
   Context,
   Emitter,
@@ -29,8 +29,8 @@ export class SectionTag extends Tag {
     this.file = parseFilePath(tokenizer, this.liquid);
     this.currentFile = token.file;
     const message = `${this.file}${token.begin}${token.end}`;
-    let messageBytes = ethers.toUtf8Bytes(message);
-    this.instanceId = sha256(messageBytes);
+    let messageBytes = ethers.utils.toUtf8Bytes(message);
+    this.instanceId = ethers.utils.sha256(messageBytes);
   }
 
   *render(ctx: Context, emitter: Emitter): unknown {

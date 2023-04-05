@@ -11,8 +11,8 @@ class SectionTag extends liquidjs_1.Tag {
         this.file = parseFilePath(tokenizer, this.liquid);
         this.currentFile = token.file;
         const message = `${this.file}${token.begin}${token.end}`;
-        let messageBytes = ethers_1.ethers.toUtf8Bytes(message);
-        this.instanceId = (0, ethers_1.sha256)(messageBytes);
+        let messageBytes = ethers_1.ethers.utils.toUtf8Bytes(message);
+        this.instanceId = ethers_1.ethers.utils.sha256(messageBytes);
     }
     *render(ctx, emitter) {
         const { liquid } = this;
