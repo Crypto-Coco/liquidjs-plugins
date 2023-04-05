@@ -1,0 +1,15 @@
+{
+  "name": "liquidjs-plugin",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "ethers": "^6.2.3",
+    "liquidjs": "^10.7.0",
+    "typescript": "^5.0.3"
+  }
+}
