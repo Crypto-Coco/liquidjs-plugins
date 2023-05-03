@@ -20,10 +20,10 @@ class SectionTag extends liquidjs_1.Tag {
         (0, liquidjs_1.assert)(filepath, () => `illegal filename "${filepath}"`);
         const scope = ctx.getAll();
         const localScope = { section: scope["sections"][this.instanceId] };
-        const globalScope = ctx.globals;
-        const localCtx = new liquidjs_1.Context(Object.assign(Object.assign({}, localScope), globalScope), ctx.opts);
+        ctx.push(localScope); // ローカルスコープをプッシュ
         const templates = (yield liquid._parsePartialFile(filepath, ctx.sync, this["currentFile"]));
-        yield liquid.renderer.renderTemplates(templates, localCtx, emitter);
+        yield liquid.renderer.renderTemplates(templates, ctx, emitter);
+        ctx.pop(); // ローカルスコープを元に戻す
     }
 }
 exports.SectionTag = SectionTag;

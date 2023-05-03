@@ -44,16 +44,17 @@ export class SectionTag extends Tag {
 
     const scope = ctx.getAll();
     const localScope = { section: (scope as any)["sections"][this.instanceId] };
-    const globalScope = ctx.globals;
 
-    const localCtx = new Context({ ...localScope, ...globalScope }, ctx.opts);
+    ctx.push(localScope); // ローカルスコープをプッシュ
 
     const templates = (yield liquid._parsePartialFile(
       filepath,
       ctx.sync,
       this["currentFile"]
     )) as Template[];
-    yield liquid.renderer.renderTemplates(templates, localCtx, emitter);
+    yield liquid.renderer.renderTemplates(templates, ctx, emitter);
+
+    ctx.pop(); // ローカルスコープを元に戻す
   }
 }
 
