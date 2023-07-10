@@ -1,3 +1,4 @@
 import { EndSchemaTag, SchemaTag } from "./tags/schema";
 import { SectionTag } from "./tags/section";
-export { SectionTag, SchemaTag, EndSchemaTag };
+import { FetchTag } from "./tags/fetch";
+export { SectionTag, SchemaTag, EndSchemaTag, FetchTag };

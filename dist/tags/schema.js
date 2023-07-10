@@ -18,7 +18,6 @@ class SchemaTag extends liquidjs_1.Tag {
         catch (e) {
             throw new Error("Invalid JSON in schema tag");
         }
-        // コンテンツを削除
         while (remainTokens.length) {
             const token = remainTokens.shift();
             if ((0, typeGuard_1.isTagToken)(token) && token.name === "endschema")
