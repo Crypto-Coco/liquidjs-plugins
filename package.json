@@ -1,10 +1,9 @@
 {
   "name": "liquidjs-plugin",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
     "build:dev": "cross-env NODE_ENV=development ts-node -r dotenv/config src/index.ts dotenv_config_path=.env.development",
     "build:prod": "cross-env NODE_ENV=production ts-node -r dotenv/config src/index.ts dotenv_config_path=.env"
   },

@@ -53,7 +53,6 @@ export class FetchTag extends Tag {
       tokenizer.advance();
       const value = tokenizer.readValue();
       if (key === "chain_id" && value) {
-        console.log("chain_id", `aaa${value.getText()}aaa`);
         this.chainId = value.getText().replace(/"/g, "");
       } else if (
         key === "contract_address" &&
@@ -65,7 +64,6 @@ export class FetchTag extends Tag {
       tokenizer.skipBlank();
 
       if (tokenizer.peek() === "|") {
-        console.log("break!!!");
         break;
       }
 
