@@ -1,5 +1,5 @@
 import { Liquid, Tag, TagToken, TopLevelToken } from "liquidjs";
-import { isTagToken } from "../utils/typeGuard";
+import { isTagToken } from "../utils/typeGuard.js";
 
 export class SchemaTag extends Tag {
   public schema: object | null = null;

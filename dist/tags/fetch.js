@@ -1,10 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FetchTag = void 0;
 const liquidjs_1 = require("liquidjs");
 const ethers_1 = require("ethers");
-const constant_1 = require("../utils/constant");
-const fetch = require("node-fetch");
+const constant_js_1 = require("../utils/constant.js");
+const node_fetch_1 = __importDefault(require("node-fetch"));
 class FetchTag extends liquidjs_1.Tag {
     constructor(tagToken, remainTokens, liquid) {
         var _a;
@@ -77,12 +80,12 @@ class FetchTag extends liquidjs_1.Tag {
             this.chainId = yield valueToken.value(context);
         }
         const chainId = Number(this.chainId);
-        const collectionRes = yield fetch(constant_1.ADMIN_API_URL +
+        const collectionRes = yield (0, node_fetch_1.default)(constant_js_1.ADMIN_API_URL +
             `/collections/byAddress?address=${this.contractAddress}&chainId=${chainId}`);
         const collection = yield collectionRes.json();
-        const collectionTemplateRes = yield fetch(constant_1.ADMIN_API_URL + `/collectionTemplates/${collection.collectionTemplateId}`);
+        const collectionTemplateRes = yield (0, node_fetch_1.default)(constant_js_1.ADMIN_API_URL + `/collectionTemplates/${collection.collectionTemplateId}`);
         const collectionTemplate = yield collectionTemplateRes.json();
-        const chainRes = yield fetch(constant_1.ADMIN_API_URL + `/chains/${chainId}`);
+        const chainRes = yield (0, node_fetch_1.default)(constant_js_1.ADMIN_API_URL + `/chains/${chainId}`);
         const chain = yield chainRes.json();
         const provider = new ethers_1.ethers.providers.JsonRpcProvider(chain.rpcUrl, chainId);
         const contract = new ethers_1.ethers.Contract(collection.contractAddress, collectionTemplate.abi, provider);
