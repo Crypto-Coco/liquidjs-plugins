@@ -13,7 +13,7 @@ import {
 } from "liquidjs";
 import { HTML } from "liquidjs/dist/src/template";
 import { ethers } from "ethers";
-import { ADMIN_API_URL } from "../utils/constant.js";
+import { ADMIN_API_URL } from "../utils/constant";
 import fetch from "node-fetch";
 
 export class FetchTag extends Tag {

@@ -3,17 +3,22 @@
   "version": "1.0.12",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "build:dev": "cross-env NODE_ENV=development ts-node -r dotenv/config src/index.ts dotenv_config_path=.env.development",
+    "build:prod": "cross-env NODE_ENV=production ts-node -r dotenv/config src/index.ts dotenv_config_path=.env"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
+    "@types/node-fetch": "^2.6.4",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.3.1",
     "ethers": "^5",
     "liquidjs": "^10.7.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.3"
   },
   "dependencies": {
-    "node-fetch": "^3.3.1"
+    "node-fetch": "2.6.6"
   }
 }
