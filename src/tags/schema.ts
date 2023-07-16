@@ -22,7 +22,6 @@ export class SchemaTag extends Tag {
       throw new Error("Invalid JSON in schema tag");
     }
 
-    // コンテンツを削除
     while (remainTokens.length) {
       const token = remainTokens.shift()!;
       if (isTagToken(token) && token.name === "endschema") return;
