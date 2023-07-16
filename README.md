@@ -18,5 +18,9 @@ $ yarn build
 ```
 
 ```bash
-$ 
+$ git tag v<version>
+```
+
+```bash
+$ git push tag <version>
 ```

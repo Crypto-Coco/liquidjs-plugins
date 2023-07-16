@@ -4,6 +4,7 @@ exports.FetchTag = void 0;
 const liquidjs_1 = require("liquidjs");
 const ethers_1 = require("ethers");
 const constant_1 = require("../utils/constant");
+const fetch = require("node-fetch");
 class FetchTag extends liquidjs_1.Tag {
     constructor(tagToken, remainTokens, liquid) {
         var _a;

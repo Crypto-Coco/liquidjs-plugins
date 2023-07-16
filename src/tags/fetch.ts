@@ -14,6 +14,7 @@ import {
 import { HTML } from "liquidjs/dist/src/template";
 import { ethers } from "ethers";
 import { ADMIN_API_URL } from "../utils/constant";
+const fetch = require("node-fetch");
 
 export class FetchTag extends Tag {
   private key: string;
