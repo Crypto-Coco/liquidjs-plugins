@@ -6,13 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FetchTag = void 0;
 const liquidjs_1 = require("liquidjs");
 const ethers_1 = require("ethers");
-const constant_js_1 = require("../utils/constant.js");
+const constant_1 = require("../utils/constant");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 class FetchTag extends liquidjs_1.Tag {
     constructor(tagToken, remainTokens, liquid) {
         var _a;
         super(tagToken, remainTokens, liquid);
         this.args = [];
+        this.argValues = [];
         const tokenizer = new liquidjs_1.Tokenizer(tagToken.args);
         this.key = tokenizer.readIdentifier().content;
         tokenizer.skipBlank();
@@ -30,7 +31,6 @@ class FetchTag extends liquidjs_1.Tag {
             tokenizer.advance();
             const value = tokenizer.readValue();
             if (key === "chain_id" && value) {
-                console.log("chain_id", `aaa${value.getText()}aaa`);
                 this.chainId = value.getText().replace(/"/g, "");
             }
             else if (key === "contract_address" &&
@@ -39,7 +39,6 @@ class FetchTag extends liquidjs_1.Tag {
             }
             tokenizer.skipBlank();
             if (tokenizer.peek() === "|") {
-                console.log("break!!!");
                 break;
             }
             if (tokenizer.peek() === ",") {
@@ -49,8 +48,20 @@ class FetchTag extends liquidjs_1.Tag {
         const filterArg = tokenizer.readFilter();
         if (filterArg && filterArg.name === "args") {
             filterArg.args.forEach((arg) => {
-                if (liquidjs_1.TypeGuards.isNumberToken(arg) || liquidjs_1.TypeGuards.isQuotedToken(arg)) {
-                    this.args.push(arg.getText());
+                if (liquidjs_1.TypeGuards.isQuotedToken(arg)) {
+                    let argText = arg.getText();
+                    argText = argText.slice(1, -1);
+                    if (argText.startsWith('{{') && argText.endsWith('}}')) {
+                        let argName = argText.slice(2, -2).trim();
+                        this.argValues.push(new liquidjs_1.Value(argName, this.liquid));
+                    }
+                    else {
+                        this.args.push(argText);
+                    }
+                }
+                else if (liquidjs_1.TypeGuards.isNumberToken(arg)) {
+                    let argText = arg.getText();
+                    this.args.push(argText);
                 }
             });
         }
@@ -80,16 +91,25 @@ class FetchTag extends liquidjs_1.Tag {
             this.chainId = yield valueToken.value(context);
         }
         const chainId = Number(this.chainId);
-        const collectionRes = yield (0, node_fetch_1.default)(constant_js_1.ADMIN_API_URL +
+        const collectionRes = yield (0, node_fetch_1.default)(constant_1.ADMIN_API_URL +
             `/collections/byAddress?address=${this.contractAddress}&chainId=${chainId}`);
+        console.log("collectionRes", collectionRes);
         const collection = yield collectionRes.json();
-        const collectionTemplateRes = yield (0, node_fetch_1.default)(constant_js_1.ADMIN_API_URL + `/collectionTemplates/${collection.collectionTemplateId}`);
+        const collectionTemplateRes = yield (0, node_fetch_1.default)(constant_1.ADMIN_API_URL + `/collectionTemplates/${collection.collectionTemplateId}`);
         const collectionTemplate = yield collectionTemplateRes.json();
-        const chainRes = yield (0, node_fetch_1.default)(constant_js_1.ADMIN_API_URL + `/chains/${chainId}`);
+        const chainRes = yield (0, node_fetch_1.default)(constant_1.ADMIN_API_URL + `/chains/${chainId}`);
         const chain = yield chainRes.json();
+        const resolvedArgs = [];
+        for (let argValue of this.argValues) {
+            let value = (yield argValue.value(context)).toString();
+            resolvedArgs.push(value);
+        }
+        for (let arg of this.args) {
+            resolvedArgs.push(arg);
+        }
         const provider = new ethers_1.ethers.providers.JsonRpcProvider(chain.rpcUrl, chainId);
         const contract = new ethers_1.ethers.Contract(collection.contractAddress, collectionTemplate.abi, provider);
-        const result = yield contract[this.functionName](...this.args);
+        const result = yield contract[this.functionName](...resolvedArgs);
         context.push({ [this.key]: result });
         yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
     }

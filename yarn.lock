@@ -590,10 +590,9 @@ js-sha3@0.8.0:
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.8.0.tgz#b9b7a5da73afad7dedd0f8c463954cbde6818840"
   integrity sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==
 
-liquidjs@^10.7.0:
-  version "10.8.4"
-  resolved "https://registry.yarnpkg.com/liquidjs/-/liquidjs-10.8.4.tgz#32596e189e264f60794af8f41cd26c0c66f6da49"
-  integrity sha512-HSpYAFBVWxhwWsTKPBJgPm3bnwwIzAZjy17XhX7uJCKJ8H6A1YstZSFmPqMmWfSuJOg43RSx+qWVSA1Fu3+B2w==
+"liquidjs@git+https://github.com/Crypto-Coco/liquidjs.git#1.0.0":
+  version "10.7.0"
+  resolved "git+https://github.com/Crypto-Coco/liquidjs.git#5b8c7d084d47b389e4805b40f1bd1a20c62b33f3"
   dependencies:
     commander "^10.0.0"
 

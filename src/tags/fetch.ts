@@ -23,6 +23,7 @@ export class FetchTag extends Tag {
   private chainId?: string;
   private contractAddress?: string;
   private args: string[] = [];
+  private argValues: Value[] = [];
 
   constructor(
     tagToken: TagToken,
@@ -75,8 +76,18 @@ export class FetchTag extends Tag {
     const filterArg = tokenizer.readFilter();
     if (filterArg && filterArg.name === "args") {
       filterArg.args.forEach((arg) => {
-        if (TypeGuards.isNumberToken(arg) || TypeGuards.isQuotedToken(arg)) {
-          this.args.push(arg.getText());
+        if (TypeGuards.isQuotedToken(arg)) {
+          let argText = arg.getText();
+          argText = argText.slice(1, -1);
+          if(argText.startsWith('{{') && argText.endsWith('}}')) {
+            let argName = argText.slice(2, -2).trim();
+            this.argValues.push(new Value(argName, this.liquid));
+          } else {
+            this.args.push(argText);
+          }  
+        } else if (TypeGuards.isNumberToken(arg)) {
+          let argText = arg.getText();
+          this.args.push(argText);
         }
       });
     }
@@ -119,6 +130,7 @@ export class FetchTag extends Tag {
       ADMIN_API_URL +
         `/collections/byAddress?address=${this.contractAddress}&chainId=${chainId}`
     );
+    console.log("collectionRes", collectionRes)
     const collection = yield collectionRes.json();
     const collectionTemplateRes = yield fetch(
       ADMIN_API_URL + `/collectionTemplates/${collection.collectionTemplateId}`
@@ -127,6 +139,15 @@ export class FetchTag extends Tag {
 
     const chainRes = yield fetch(ADMIN_API_URL + `/chains/${chainId}`);
     const chain = yield chainRes.json();
+
+    const resolvedArgs = [];
+    for(let argValue of this.argValues) {
+      let value = (yield argValue.value(context)).toString()
+      resolvedArgs.push(value);
+    }
+    for(let arg of this.args) {
+      resolvedArgs.push(arg);
+    }
 
     const provider = new ethers.providers.JsonRpcProvider(
       chain.rpcUrl,
@@ -137,7 +158,7 @@ export class FetchTag extends Tag {
       collectionTemplate.abi,
       provider
     );
-    const result = yield contract[this.functionName](...this.args);
+    const result = yield contract[this.functionName](...resolvedArgs);
     context.push({ [this.key]: result });
 
     yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
