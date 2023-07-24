@@ -22,5 +22,5 @@ $ git tag v<version>
 ```
 
 ```bash
-$ git push tag <version>
+$ git push origin tag <version>
 ```
