@@ -109,58 +109,62 @@ export class FetchTag extends Tag {
   }
 
   *render(context: Context, emitter: Emitter): any {
-    if (this.contractAddress && this.contractAddress.startsWith("{{")) {
-      const valueToken = new Value(
-        this.contractAddress.slice(2, -2).trim(),
-        this.liquid
+    try {
+      if (this.contractAddress && this.contractAddress.startsWith("{{")) {
+        const valueToken = new Value(
+          this.contractAddress.slice(2, -2).trim(),
+          this.liquid
+        );
+        this.contractAddress = (yield valueToken.value(context)).toString();
+      }
+
+      if (this.chainId && this.chainId.toString().startsWith("{{")) {
+        const valueToken = new Value(
+          this.chainId.toString().slice(2, -2).trim(),
+          this.liquid
+        );
+        this.chainId = yield valueToken.value(context);
+      }
+
+      const chainId = Number(this.chainId);
+      const collectionRes = yield fetch(
+        ADMIN_API_URL +
+          `/collections/byAddress?address=${this.contractAddress}&chainId=${chainId}`
       );
-      this.contractAddress = (yield valueToken.value(context)).toString();
-    }
-
-    if (this.chainId && this.chainId.toString().startsWith("{{")) {
-      const valueToken = new Value(
-        this.chainId.toString().slice(2, -2).trim(),
-        this.liquid
+      console.log("collectionRes", collectionRes)
+      const collection = yield collectionRes.json();
+      const collectionTemplateRes = yield fetch(
+        ADMIN_API_URL + `/collectionTemplates/${collection.collectionTemplateId}`
       );
-      this.chainId = yield valueToken.value(context);
+      const collectionTemplate = yield collectionTemplateRes.json();
+
+      const chainRes = yield fetch(ADMIN_API_URL + `/chains/${chainId}`);
+      const chain = yield chainRes.json();
+
+      const resolvedArgs = [];
+      for(let argValue of this.argValues) {
+        let value = (yield argValue.value(context)).toString()
+        resolvedArgs.push(value);
+      }
+      for(let arg of this.args) {
+        resolvedArgs.push(arg);
+      }
+
+      const provider = new ethers.providers.JsonRpcProvider(
+        chain.rpcUrl,
+        chainId
+      );
+      const contract = new ethers.Contract(
+        collection.contractAddress,
+        collectionTemplate.abi,
+        provider
+      );
+      const result = yield contract[this.functionName](...resolvedArgs);
+      context.push({ [this.key]: result });
+
+      yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
+    } catch (e) {
+      console.error(e);
     }
-
-    const chainId = Number(this.chainId);
-    const collectionRes = yield fetch(
-      ADMIN_API_URL +
-        `/collections/byAddress?address=${this.contractAddress}&chainId=${chainId}`
-    );
-    console.log("collectionRes", collectionRes)
-    const collection = yield collectionRes.json();
-    const collectionTemplateRes = yield fetch(
-      ADMIN_API_URL + `/collectionTemplates/${collection.collectionTemplateId}`
-    );
-    const collectionTemplate = yield collectionTemplateRes.json();
-
-    const chainRes = yield fetch(ADMIN_API_URL + `/chains/${chainId}`);
-    const chain = yield chainRes.json();
-
-    const resolvedArgs = [];
-    for(let argValue of this.argValues) {
-      let value = (yield argValue.value(context)).toString()
-      resolvedArgs.push(value);
-    }
-    for(let arg of this.args) {
-      resolvedArgs.push(arg);
-    }
-
-    const provider = new ethers.providers.JsonRpcProvider(
-      chain.rpcUrl,
-      chainId
-    );
-    const contract = new ethers.Contract(
-      collection.contractAddress,
-      collectionTemplate.abi,
-      provider
-    );
-    const result = yield contract[this.functionName](...resolvedArgs);
-    context.push({ [this.key]: result });
-
-    yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
   }
 }

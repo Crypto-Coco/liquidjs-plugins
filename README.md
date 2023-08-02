@@ -14,8 +14,10 @@ $ yarn link liquidjs-plugin
 ## デプロイ
 
 ```bash
-$ yarn build
+$ npx tsc
 ```
+
+package.jsonのバージョンをあげてcommitする
 
 ```bash
 $ git tag v<version>
