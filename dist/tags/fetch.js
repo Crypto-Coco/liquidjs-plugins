@@ -116,6 +116,8 @@ class FetchTag extends liquidjs_1.Tag {
         }
         catch (e) {
             console.error(e);
+            context.push({ [this.key]: null });
+            yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
         }
     }
 }

@@ -165,6 +165,8 @@ export class FetchTag extends Tag {
       yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
     } catch (e) {
       console.error(e);
+      context.push({ [this.key]: null });
+      yield this.liquid.renderer.renderTemplates(this.tpls, context, emitter);
     }
   }
 }
